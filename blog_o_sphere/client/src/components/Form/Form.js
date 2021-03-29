@@ -8,20 +8,25 @@ import useStyles from './styles';
 const Form = ({ currentId, setCurrentId }) => {
     const [postData, setPostData] = useState({
         
-        title: '', message: '', tags: '', selectFile: ''
+        title: '', message:'', tags:'', selectedFile:''
     })
-    const post = useSelector((state) => currentId ? state.posts.find((message) => message._id === currentId) : null );
+
+    const post = useSelector((state) => currentId ? state.posts.find((p) => p._id === currentId) : null );
+
     const classes = useStyles();
+
     const user = JSON.parse(localStorage.getItem('profile'));
+
+    const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        if (currentId === 0) {
-            dispatch(createPost({ ...postData, name: user?.result?.name }))
+        if (currentId) {
+            dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }))
             clear();
         }else{
-            dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }))
+            dispatch(createPost({ ...postData, name: user?.result?.name }))
             clear();
         } 
     }
@@ -30,11 +35,9 @@ const Form = ({ currentId, setCurrentId }) => {
         if(post) setPostData(post);
     }, [post])
 
-    const dispatch = useDispatch();
-
     const clear =() => {
-        setCurrentId(0);
-        setPostData({title:'', message:'', tags:'', selectFile:''})
+        setCurrentId(null);
+        setPostData({title:'', message:'', tags:'', selectedFile:''})
     }
 
     if(!user?.result?.name){
@@ -66,7 +69,7 @@ const Form = ({ currentId, setCurrentId }) => {
                     <FileBase
                         type="file"
                         multiple={false}
-                        onDone={({base64}) => setPostData({...postData, setlectedFile: base64})}>
+                        onDone={({base64}) => setPostData({...postData, selectedFile: base64})}>
                     </FileBase>
                     
                 </div>
